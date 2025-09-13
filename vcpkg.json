@@ -1,0 +1,22 @@
+{
+  "dependencies": [
+    {
+      "name": "sdl3",
+      "features": [
+        "vulkan"
+      ]
+    },
+    {
+      "name": "sdl3-ttf",
+      "features": [
+        "harfbuzz"
+      ]
+    },
+    {
+      "name": "icu"
+    },
+    {
+      "name": "cglm"
+    }
+  ]
+}

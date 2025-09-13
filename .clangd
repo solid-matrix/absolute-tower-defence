@@ -1,0 +1,6 @@
+CompileFlags:
+  CompilationDatabase: build\x64-debug
+Completion:
+  ArgumentLists: None
+InlayHints:
+  ParameterNames: false
