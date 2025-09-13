@@ -1,14 +1,22 @@
-#include "v2d_application.h"
-
+#include "v2d_app_context.h"
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_video.h>
 
-V2D_Application *V2D_CreateApplication(V2D_Config *config) {
-    V2D_Application *app = SDL_malloc(sizeof(V2D_Application));
+V2D_AppContext *V2D_CreateAppContext(V2D_Config *config) {
+    V2D_AppContext *app = SDL_malloc(sizeof(V2D_AppContext));
     if (!app)
         return NULL;
+
+    app->onLoad = config->onLoad;
+    app->onUpdate = config->onUpdate;
+    app->onRender = config->onRender;
+    app->onEvent = config->onEvent;
+    app->onUnload = config->onUnload;
+
+    app->should_close = false;
+    app->return_code = 0;
 
     SDL_WindowFlags windowFlags = SDL_WINDOW_HIDDEN;
 
@@ -51,7 +59,7 @@ V2D_Application *V2D_CreateApplication(V2D_Config *config) {
     return app;
 }
 
-void V2D_DestroyApplication(V2D_Application *app) {
+void V2D_DestroyAppContext(V2D_AppContext *app) {
     if (app->device && app->window) {
         SDL_WaitForGPUIdle(app->device);
         SDL_ReleaseWindowFromGPUDevice(app->device, app->window);
@@ -67,40 +75,7 @@ void V2D_DestroyApplication(V2D_Application *app) {
         SDL_free(app);
 }
 
-void V2D_BeginRender(V2D_Application *app) {
-    SDL_GPUTexture *swapchain_texture;
-    Uint32 width, height;
-
-    app->command_buffer = SDL_AcquireGPUCommandBuffer(app->device);
-
-    if (!SDL_WaitAndAcquireGPUSwapchainTexture(app->command_buffer, app->window, &swapchain_texture, &width, &height) || !swapchain_texture) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "failed to acquire swapchain texture %s", SDL_GetError());
-        SDL_SubmitGPUCommandBuffer(app->command_buffer);
-        // TODO error handling
-        //return SDL_APP_CONTINUE;
-    }
-
-    // create the color target
-    SDL_GPUColorTargetInfo color_target_info = {
-        .clear_color = {1.0f, 1.0f, 1.0f, 1.0f},
-        .load_op = SDL_GPU_LOADOP_CLEAR,
-        .mip_level = 0,
-        .store_op = SDL_GPU_STOREOP_STORE,
-        .texture = swapchain_texture,
-        .cycle = true,
-        .layer_or_depth_plane = 0,
-        .cycle_resolve_texture = false,
-    };
-
-    // begin a render pass
-    app->render_pass = SDL_BeginGPURenderPass(app->command_buffer, &color_target_info, 1, NULL);
-}
-
-void V2D_EndRender(V2D_Application *app) {
-
-    // end the render pass
-    SDL_EndGPURenderPass(app->render_pass);
-
-    // submit the command buffer
-    SDL_SubmitGPUCommandBuffer(app->command_buffer);
+void V2D_Quit(V2D_AppContext *app, int return_code) {
+    app->should_close = true;
+    app->return_code = return_code;
 }

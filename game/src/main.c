@@ -1,27 +1,31 @@
-#define USE_V2D_MAIN
 #include "v2d.h"
 
-void V2DAPP_Config(V2D_Config *config) {
-    config->window_title = "Absolute Tower Defence";
-    config->window_width = 1280;
-    config->window_height = 960;
-    config->debug = true;
+void Load(void *state, V2D_AppContext *app_ctx) {
+    SDL_Log("load");
 }
 
-void V2DAPP_Init(V2D_Application *app, int argc, char **argv) {
-    SDL_Log("init");
+void Update(void *state, V2D_AppContext *app_ctx, float dt) {
 }
 
-void V2DAPP_Update(V2D_Application *app, float dt) {
+void Render(void *state, V2D_AppContext *app_ctx, V2D_RenderContext *render_ctx) {
 }
 
-void V2DAPP_Draw(V2D_Application *app) {
-    SDL_Delay(50);
+void Event(void *state, V2D_AppContext *app_ctx, SDL_Event *event) {
 }
 
-void V2DAPP_Event(V2D_Application *app, SDL_Event *event) {
+void Unload(void *state, V2D_AppContext *app_ctx) {
+    SDL_Log("unload");
 }
 
-void V2DAPP_Quit() {
-    SDL_Log("quit");
+int main(int argc, char *argv[]) {
+    V2D_Config config = V2D_CreateDefaultConfig();
+    config.window_title = "Absolute Tower Defence";
+    config.debug = true;
+    config.onLoad = Load;
+    config.onUpdate = Update;
+    config.onRender = Render;
+    config.onEvent = Event;
+    config.onUnload = Unload;
+
+    return V2D_Run(&config, NULL);
 }
