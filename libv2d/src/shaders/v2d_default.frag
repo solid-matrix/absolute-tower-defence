@@ -1,12 +1,31 @@
-#version 330 core
+// #version 460
 
-in vec2 fragTexCoord;
-in vec4 fragColor;
+// layout(location = 0) in vec4 v_color;
+// layout(location = 0) out vec4 FragColor;
 
-out vec4 finalColor;
+// layout(std140, set = 3, binding = 0) uniform UniformBlock {
+//     vec2 resolution;
+//     float time;
+// };
 
-uniform float time;
-uniform vec2 resolution;
+// void main()
+// {
+//     float pulse = sin(time) * 0.5 + 0.5; // range [0, 1]
+//     float effect_ratio = 1.0;
+//     float effect_min = 0.0;
+
+//     FragColor = vec4(v_color.rgb * (effect_min + pulse * effect_ratio), v_color.a);
+// }
+
+#version 460
+
+layout(location = 0) in vec4 v_color;
+layout(location = 0) out vec4 FragColor;
+
+layout(std140, set = 3, binding = 0) uniform UniformBlock {
+    vec2 resolution;
+    float time;
+};
 
 vec3 render(vec2 screen_coords) {
     const float speed = 0.2;
@@ -38,13 +57,14 @@ vec3 crt(vec3 c, vec2 screen_coords) {
     return mix(c, vec3(0.0), apply);
 }
 
-void main() {
+void main()
+{
     const float pixel_size = 1.0;
     vec2 screen_coords = floor((gl_FragCoord.xy) / pixel_size) * pixel_size;
 
     vec3 o = render(screen_coords);
 
-    //o = crt(o.xyz, screen_coords);
+    o = crt(o.xyz, screen_coords);
 
-    finalColor = vec4(o, 1.0);
+    FragColor = vec4(o, 1.0);
 }

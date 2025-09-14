@@ -22,6 +22,8 @@
 
 typedef struct V2D_Config V2D_Config;
 
+typedef struct V2D_Data V2D_Data;
+
 typedef struct V2D_AppContext V2D_AppContext;
 
 typedef struct V2D_RenderContext V2D_RenderContext;
@@ -59,6 +61,23 @@ struct V2D_Config {
 
     // TODO window_vsync;
 };
+
+typedef struct {
+    float x;
+    float y;
+} V2D_Point;
+
+typedef struct {
+    float width;
+    float height;
+} V2D_Extent;
+
+typedef struct {
+    float r;
+    float g;
+    float b;
+    float a;
+} V2D_Color;
 
 V2D_DECLSPEC V2D_Config V2D_CALL V2D_CreateDefaultConfig();
 

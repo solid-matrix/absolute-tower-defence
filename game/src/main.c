@@ -20,6 +20,7 @@ void Unload(void *state, V2D_AppContext *app_ctx) {
 int main(int argc, char *argv[]) {
     V2D_Config config = V2D_CreateDefaultConfig();
     config.window_title = "Absolute Tower Defence";
+    config.window_resiable = true;
     config.debug = true;
     config.onLoad = Load;
     config.onUpdate = Update;
