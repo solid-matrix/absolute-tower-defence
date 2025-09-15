@@ -1,5 +1,5 @@
-#include "v2d_buffer.h"
-#include "v2d_context.h"
+#include "v2d_internal.h"
+
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL_stdinc.h>
 

@@ -19,3 +19,22 @@ Sub-projects:
   It will serve as a testbed for the aforementioned libraries.
 
 Under development...
+
+
+
+Todo Lists
+
+- default_graphics_pipeline
+- clear function
+- draw functions
+  - circle
+  - ellipse
+  - rectangle
+  - polygon (convex)
+  - rounded rectangle
+  - lines
+  - points
+  - tecture
+- draw_batch
+- draw_records
+- wrap the events

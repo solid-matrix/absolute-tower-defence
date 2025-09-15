@@ -1,8 +1,6 @@
-#include "v2d_graphics_pipeline.h"
 #include "shaders/v2d_default_frag.h"
 #include "shaders/v2d_default_vert.h"
-#include "v2d.h"
-#include "v2d_default.h"
+#include "v2d_internal.h"
 
 #include <SDL3/SDL_gpu.h>
 
@@ -40,14 +38,18 @@ SDL_GPUGraphicsPipeline *V2D_CreateDefaultGraphicsPipeline(V2D_AppContext *app) 
     SDL_GPUColorTargetDescription color_target_descs[] = {
         {
             .format = SDL_GetGPUSwapchainTextureFormat(app->device, app->window),
-            .blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_INVALID,
-            .blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_INVALID,
-            .blend_state.color_blend_op = SDL_GPU_BLENDOP_INVALID,
-            .blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_INVALID,
-            .blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_INVALID,
-            .blend_state.alpha_blend_op = SDL_GPU_BLENDOP_INVALID,
+
+            .blend_state.enable_blend = true,
+
+            .blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+            .blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+            .blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD,
+
+            .blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
+            .blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO,
+            .blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD,
+
             .blend_state.color_write_mask = SDL_GPU_COLORCOMPONENT_R | SDL_GPU_COLORCOMPONENT_G | SDL_GPU_COLORCOMPONENT_B | SDL_GPU_COLORCOMPONENT_A,
-            .blend_state.enable_blend = false,
             .blend_state.enable_color_write_mask = false,
         },
     };

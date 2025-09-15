@@ -1,9 +1,8 @@
-#include "v2d_config.h"
+#include "v2d_internal.h"
 #include <SDL3/SDL_stdinc.h>
-#include <corecrt_search.h>
 
-V2D_Config V2D_CreateDefaultConfig() {
-    return (V2D_Config){
+V2D_AppConfig V2D_CreateDefaultConfig() {
+    return (V2D_AppConfig){
         .onLoad = NULL,
         .onUpdate = NULL,
         .onRender = NULL,

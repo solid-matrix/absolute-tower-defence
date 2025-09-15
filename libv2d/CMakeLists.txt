@@ -26,3 +26,6 @@ target_link_libraries(libv2d PUBLIC SDL3_ttf::SDL3_ttf)
 find_package(ICU REQUIRED COMPONENTS uc)
 target_link_libraries(libv2d PUBLIC ${ICU_LIBRARIES})
 target_include_directories(libv2d PUBLIC ${ICU_INCLUDE_DIRS})
+
+find_package(cglm CONFIG REQUIRED)
+    target_link_libraries(libv2d PRIVATE cglm::cglm)

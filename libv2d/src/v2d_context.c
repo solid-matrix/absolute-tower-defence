@@ -1,21 +1,14 @@
-#include "v2d_context.h"
-#include "v2d_graphics_pipeline.h"
+#include "v2d_internal.h"
 
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_video.h>
 
-V2D_AppContext *V2D_CreateAppContext(V2D_Config *config) {
+V2D_AppContext *V2D_CreateAppContext(V2D_AppConfig *config) {
     V2D_AppContext *app = SDL_malloc(sizeof(V2D_AppContext));
     if (!app)
         return NULL;
-
-    app->onLoad = config->onLoad;
-    app->onUpdate = config->onUpdate;
-    app->onRender = config->onRender;
-    app->onEvent = config->onEvent;
-    app->onUnload = config->onUnload;
 
     app->should_close = false;
     app->return_code = 0;
@@ -89,39 +82,43 @@ void V2D_Quit(V2D_AppContext *app, int return_code) {
 }
 
 V2D_RenderContext *V2D_BeginRenderContext(V2D_AppContext *app) {
-    V2D_RenderContext *draw_context = SDL_malloc(sizeof(V2D_RenderContext));
+    V2D_RenderContext *render_context = SDL_malloc(sizeof(V2D_RenderContext));
 
-    draw_context->app = app;
-    draw_context->command_buffer = SDL_AcquireGPUCommandBuffer(app->device);
+    render_context->app = app;
+    render_context->command_buffer = SDL_AcquireGPUCommandBuffer(app->device);
+    render_context->graphics_pipeline = NULL;
 
-    if (!SDL_WaitAndAcquireGPUSwapchainTexture(draw_context->command_buffer, app->window, &draw_context->swapchain_texture, &draw_context->width, &draw_context->height) || !draw_context->swapchain_texture) {
+    if (!SDL_WaitAndAcquireGPUSwapchainTexture(render_context->command_buffer, app->window, &render_context->swapchain_texture, &render_context->width, &render_context->height) || !render_context->swapchain_texture) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "failed to acquire swapchain texture %s", SDL_GetError());
-        SDL_SubmitGPUCommandBuffer(draw_context->command_buffer);
+        SDL_SubmitGPUCommandBuffer(render_context->command_buffer);
         // TODO error handling
         //return SDL_APP_CONTINUE;
     }
 
     // create the color target
     SDL_GPUColorTargetInfo color_target_info = {
-        .clear_color = {1.0f, 1.0f, 1.0f, 0.0f},
-        .load_op = SDL_GPU_LOADOP_CLEAR,
+        .texture = render_context->swapchain_texture,
         .mip_level = 0,
-        .store_op = SDL_GPU_STOREOP_STORE,
-        .texture = draw_context->swapchain_texture,
-        .cycle = true,
         .layer_or_depth_plane = 0,
+        .clear_color = {1.0f, 1.0f, 1.0f, 1.0f},
+        .load_op = SDL_GPU_LOADOP_CLEAR,
+        .store_op = SDL_GPU_STOREOP_STORE,
+        .resolve_texture = NULL,
+        .resolve_mip_level = 0,
+        .resolve_layer = 0,
+        .cycle = false,
         .cycle_resolve_texture = false,
     };
 
-    draw_context->render_pass = SDL_BeginGPURenderPass(draw_context->command_buffer, &color_target_info, 1, NULL);
+    render_context->render_pass = SDL_BeginGPURenderPass(render_context->command_buffer, &color_target_info, 1, NULL);
 
-    return draw_context;
+    return render_context;
 }
 
-void V2D_EndRenderContext(V2D_AppContext *app, V2D_RenderContext *draw_context) {
+void V2D_EndRenderContext(V2D_AppContext *app, V2D_RenderContext *render_context) {
     // end the render pass
-    SDL_EndGPURenderPass(draw_context->render_pass);
+    SDL_EndGPURenderPass(render_context->render_pass);
 
     // submit the command buffer
-    SDL_SubmitGPUCommandBuffer(draw_context->command_buffer);
+    SDL_SubmitGPUCommandBuffer(render_context->command_buffer);
 }
